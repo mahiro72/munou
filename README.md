@@ -17,7 +17,7 @@
 ## 実行例
 <img src="https://github.com/user-attachments/assets/d0d06cd4-8f62-44c7-8c48-a99263a22ef4" width=500 />
 
-文脈を考慮したマルコフ連鎖により、ユーザ入力から自然にみえる返答を生成します。(よく読むとみえません。これが無能です。)
+文脈を考慮したマルコフ連鎖により、ユーザ入力から自然にみえる返答を生成します。(よく読むと自然ではありません。これが無能です。)
 
 ## 参考
 - https://news.mynavi.jp/techplus/article/rustalgorithm-26/
