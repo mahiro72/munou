@@ -134,11 +134,12 @@ fn main() {
     }
 
     // 対話モード
-    println!(">>> 終了するにはEnterキーを押してください。");
+    println!(">>> 終了するにはEnterキーを押してください。\n>>> 話しかけてみましょう。");
     loop {
         io::stdout().flush().unwrap();
         let mut input = String::new();
-        println!(">>> 何か話しかけてください。");
+        print!(">>> ");
+        io::stdout().flush().unwrap();
         io::stdin().read_line(&mut input).unwrap();
         if input.trim().is_empty() {
             break;
