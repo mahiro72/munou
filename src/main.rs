@@ -39,13 +39,13 @@ impl MarkovChain {
         }
     }
 
-    // 単語をIDを取得する
-    pub fn get_word_id(&mut self, word: &str) -> isize { // TODO: &mut selfというキーワードはなに? &はポインタ?
-        if let Some(&id) = self.word_hash.get(word) { // TODO &idはどこからでてきた?
+    // 単語をIDを取得する。なければ新たにIDを割り当てる
+    pub fn get_word_id(&mut self, word: &str) -> isize {
+        if let Some(&id) = self.word_hash.get(word) {
             return id;
         }
-        let id = self.words.len() as isize; // TODO: なぜ as isize?
-        self.word_hash.insert(word.to_string(), id); // TODO: word_hash: HashMap<String, isize, RandomState>のRandomStateは何?
+        let id = self.words.len() as isize;
+        self.word_hash.insert(word.to_string(), id);
         self.words.push(word.to_string());
         id
     }
@@ -53,7 +53,7 @@ impl MarkovChain {
     // 文章を形態素解析で分割する
     fn split(&self, text: &str) -> Vec<String> {
         let mut worker = self.tokenizer.new_worker();
-        worker.reset_sentence(text);
+        worker.reset_sentence(text); // 以前の解析結果を破棄し、新しい文章をセット
         worker.tokenize();
         worker.token_iter().map(|t| t.surface().to_string()).collect()
     }
@@ -82,7 +82,7 @@ impl MarkovChain {
             }
             if w == END_WORD_ID {
                 tmp.clear();
-                tmp.push(TOP_WORD_ID);
+                tmp.extend([TOP_WORD_ID, TOP_WORD_ID]);
             }
         }
     }
@@ -132,7 +132,6 @@ fn main() {
     for line in lines {
         markov.train(line);
     }
-    println!("{}", markov.generate());
 
     // 対話モード
     println!(">>> 終了するにはEnterキーを押してください。");
@@ -148,13 +147,10 @@ fn main() {
         let mut worker = markov.tokenizer.new_worker();
         worker.reset_sentence(input);
         worker.tokenize();
-        let words: Vec<String> = worker.token_iter().map(|t| {
-            if t.feature().contains("名刺")  {
-                t.surface().to_string()
-            } else {
-                "".to_string()
-            }
-        }).filter(|w| !w.is_empty()).collect();
+        let words: Vec<String> = worker.token_iter()
+            .filter(|t| t.feature().contains("名詞"))
+            .map(|t| t.surface().to_string())
+            .collect();
         let output = if words.len() == 0 {
             markov.generate()
         } else {
